@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ic_launcher.xml (adaptive icon, API 26+)
+    Combines the dark-blue background and the ambulance foreground into
+    a single adaptive icon. The system masks these two layers into
+    whatever shape the launcher uses (circle, squircle, rounded square).
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>

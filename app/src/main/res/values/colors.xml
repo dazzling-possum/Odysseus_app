@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    colors.xml
+    Central place for the brand colors so we never repeat hex codes.
+    Primary = dark blue (#003366), secondary/background = white.
+-->
+<resources>
+    <color name="odysseus_primary">#003366</color>        <!-- dark blue -->
+    <color name="odysseus_primary_dark">#002244</color>   <!-- status bar -->
+    <color name="odysseus_on_primary">#FFFFFF</color>     <!-- text/icons on blue -->
+    <color name="odysseus_secondary">#FFFFFF</color>      <!-- white -->
+    <color name="odysseus_accent">#D32F2F</color>         <!-- medical red cross -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>

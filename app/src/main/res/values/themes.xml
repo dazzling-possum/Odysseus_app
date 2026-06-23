@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    themes.xml
+    Defines the app's visual theme. We base it on a Material3 theme and
+    plug in our brand colors. The toolbar, status bar, buttons, switches
+    etc. all read from these values, giving the whole app a consistent
+    dark-blue / white look.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.Odysseus" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Primary brand color (toolbars, buttons, switches). -->
+        <item name="colorPrimary">@color/odysseus_primary</item>
+        <item name="colorOnPrimary">@color/odysseus_on_primary</item>
+        <item name="colorPrimaryContainer">@color/odysseus_primary</item>
+        <item name="colorOnPrimaryContainer">@color/odysseus_on_primary</item>
+
+        <!-- Secondary / surface colors. -->
+        <item name="colorSecondary">@color/odysseus_primary</item>
+        <item name="android:colorBackground">@color/odysseus_secondary</item>
+
+        <!-- Status bar (top strip) uses the darker blue. -->
+        <item name="android:statusBarColor">@color/odysseus_primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+</resources>

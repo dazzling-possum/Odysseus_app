@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    main_menu.xml
+    The overflow (three-dot) menu shown in the toolbar on the main
+    screen: Reload the page, or open Settings.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_reload"
+        android:title="@string/menu_reload"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/menu_settings"
+        app:showAsAction="never" />
+
+</menu>

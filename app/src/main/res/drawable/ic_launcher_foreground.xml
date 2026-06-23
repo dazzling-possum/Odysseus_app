@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ic_launcher_foreground.xml
+    A simple ambulance drawn as a vector (no image file needed, so it
+    stays crisp at every screen density). It shows:
+      * a white ambulance body
+      * a red medical cross on the side
+      * two wheels
+    The viewport is 108x108 (the standard adaptive-icon canvas); the
+    art is kept inside the safe central area so the launcher can mask
+    it into a circle/squircle.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Ambulance body (white box) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,46 h38 v18 h14 l8,10 v8 h-60 z" />
+
+    <!-- Driver cabin window -->
+    <path
+        android:fillColor="#9FC6E7"
+        android:pathData="M66,50 h8 l6,8 h-14 z" />
+
+    <!-- Red medical cross on the side of the van -->
+    <path
+        android:fillColor="#D32F2F"
+        android:pathData="M40,50 h6 v5 h5 v6 h-5 v5 h-6 v-5 h-5 v-6 h5 z" />
+
+    <!-- Rear wheel -->
+    <path
+        android:fillColor="#222222"
+        android:pathData="M38,82 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+
+    <!-- Front wheel -->
+    <path
+        android:fillColor="#222222"
+        android:pathData="M70,82 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+</vector>
