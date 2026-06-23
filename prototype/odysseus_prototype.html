@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odysseus – prototype</title>
+<style>
+  :root{
+    --blue:#003366; --blue-dark:#002244; --white:#fff;
+    --red:#D32F2F; --grey:#eee; --text:#222;
+  }
+  *{box-sizing:border-box; font-family:-apple-system,Segoe UI,Roboto,sans-serif;}
+  body{margin:0; background:#cfd8e3; padding:32px; color:var(--text);}
+  h1{color:var(--blue); text-align:center; margin:0 0 4px;}
+  .sub{text-align:center; color:#557; margin:0 0 28px; font-size:14px;}
+  .stage{display:flex; gap:36px; flex-wrap:wrap; justify-content:center;}
+  .label{text-align:center; font-weight:600; color:var(--blue); margin-top:10px;}
+
+  /* Telefon-ramme */
+  .phone{
+    width:300px; height:600px; background:#000; border-radius:34px;
+    padding:12px; box-shadow:0 12px 30px rgba(0,0,0,.35);
+  }
+  .screen{
+    width:100%; height:100%; background:var(--white); border-radius:24px;
+    overflow:hidden; position:relative; display:flex; flex-direction:column;
+  }
+  /* Statuslinje */
+  .statusbar{
+    height:26px; background:var(--blue-dark); color:#fff; font-size:11px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 12px;
+  }
+  /* Toolbar */
+  .toolbar{
+    height:50px; background:var(--blue); color:#fff; display:flex;
+    align-items:center; padding:0 14px; font-size:18px; font-weight:600;
+    justify-content:space-between;
+  }
+  .toolbar .dots{font-size:22px; cursor:pointer;}
+  .toolbar .nav{font-size:20px; cursor:pointer; margin-right:10px;}
+  .progress{height:3px; background:var(--red); width:60%;
+    animation:load 1.6s ease-in-out infinite;}
+  @keyframes load{0%{width:5%}50%{width:85%}100%{width:5%}}
+
+  .body{flex:1; overflow:auto; background:#fafbfc;}
+
+  /* "Chat" innhold i WebView */
+  .pull{font-size:11px; color:#889; text-align:center; padding:6px;}
+  .msg{margin:10px 14px; padding:10px 14px; border-radius:14px; font-size:13px;
+    max-width:78%; line-height:1.35;}
+  .msg.bot{background:var(--grey); color:#222; border-top-left-radius:4px;}
+  .msg.me{background:var(--blue); color:#fff; margin-left:auto;
+    border-top-right-radius:4px;}
+  .composer{display:flex; padding:8px; gap:8px; border-top:1px solid #ddd; background:#fff;}
+  .composer input{flex:1; border:1px solid #ccc; border-radius:18px; padding:8px 12px; font-size:13px;}
+  .composer button{background:var(--blue); color:#fff; border:none; border-radius:18px; padding:0 16px;}
+
+  /* Skjema (login / settings) */
+  .form{padding:22px;}
+  .icon{width:84px; height:84px; margin:6px auto 14px; display:block;}
+  .title{text-align:center; color:var(--blue); font-weight:700; font-size:18px; margin-bottom:20px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:12px; color:var(--blue); margin-bottom:4px;}
+  .field input{width:100%; border:1px solid #bcc; border-radius:8px; padding:11px; font-size:14px;}
+  .row{display:flex; align-items:center; gap:8px; margin:14px 0; font-size:13px;}
+  .btn{width:100%; background:var(--blue); color:#fff; border:none; padding:13px;
+    border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px;}
+  .saved{font-weight:700; color:var(--blue); margin-bottom:14px; font-size:13px;}
+
+  /* Switch */
+  .switch{position:relative; width:42px; height:24px;}
+  .switch input{display:none;}
+  .slider{position:absolute; inset:0; background:#bbb; border-radius:24px; transition:.2s;}
+  .slider:before{content:""; position:absolute; width:18px; height:18px; left:3px; top:3px;
+    background:#fff; border-radius:50%; transition:.2s;}
+  .switch input:checked + .slider{background:var(--blue);}
+  .switch input:checked + .slider:before{transform:translateX(18px);}
+
+  /* Feilside */
+  .errpage{padding:48px 24px; text-align:center; color:var(--blue);}
+  .errpage code{background:#eee; padding:2px 6px; border-radius:4px; font-size:12px;}
+  .errpage .btn{margin-top:24px;}
+</style>
+</head>
+<body>
+<h1>Odysseus</h1>
+<p class="sub">Interaktiv prototype – klikk i appen for å navigere (Logg inn → Hovedskjerm → Innstillinger). Dette er en HTML-simulering av Android-appen.</p>
+
+<div class="stage">
+
+  <!-- ===== LOGIN ===== -->
+  <div>
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>09:41</span><span>▮▮▮ 100%</span></div>
+      <div class="body">
+        <div class="form">
+          <!-- ambulanse-ikon (samme som launcher) -->
+          <svg class="icon" viewBox="0 0 108 108">
+            <rect width="108" height="108" rx="22" fill="#003366"/>
+            <path fill="#fff" d="M26,46 h38 v18 h14 l8,10 v8 h-60 z"/>
+            <path fill="#9FC6E7" d="M66,50 h8 l6,8 h-14 z"/>
+            <path fill="#D32F2F" d="M40,50 h6 v5 h5 v6 h-5 v5 h-6 v-5 h-5 v-6 h5 z"/>
+            <circle cx="38" cy="82" r="7" fill="#222"/>
+            <circle cx="70" cy="82" r="7" fill="#222"/>
+          </svg>
+          <div class="title">Logg inn på Odysseus</div>
+          <div class="field"><label>Brukernavn</label><input value="paramedic"></div>
+          <div class="field"><label>Passord</label><input type="password" value="••••••••"></div>
+          <div class="row"><input type="checkbox" checked> Husk meg</div>
+          <button class="btn" onclick="alert('Sender legitimasjon som HTTP Basic Auth og åpner WebView…')">Logg inn</button>
+        </div>
+      </div>
+    </div></div>
+    <div class="label">1 · LoginActivity (valgfri)</div>
+  </div>
+
+  <!-- ===== MAIN / WEBVIEW ===== -->
+  <div>
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>09:41</span><span>▮▮▮ 100%</span></div>
+      <div class="toolbar"><span>Odysseus</span><span class="dots" onclick="alert('Meny: Last på nytt / Innstillinger')">⋮</span></div>
+      <div class="progress"></div>
+      <div class="body">
+        <div class="pull">↓ Dra ned for å laste på nytt</div>
+        <div class="msg bot">Hei! Jeg er Odysseus-agenten. Hva kan jeg hjelpe deg med?</div>
+        <div class="msg me">Vis siste pasientlogg.</div>
+        <div class="msg bot">Henter logg fra lokal tjeneste på 192.168.68.84:7000 …</div>
+        <div class="msg bot">✅ 3 oppføringer funnet. Vil du ha sammendrag?</div>
+        <div class="msg me">Ja takk.</div>
+      </div>
+      <div class="composer"><input placeholder="Skriv en melding…"><button>➤</button></div>
+    </div></div>
+    <div class="label">2 · MainActivity (WebView)</div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div>
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>09:41</span><span>▮▮▮ 100%</span></div>
+      <div class="toolbar"><span><span class="nav">✕</span>Innstillinger</span></div>
+      <div class="body">
+        <div class="form">
+          <div class="saved">Lagret nå: http://192.168.68.84:7000</div>
+          <div class="field"><label>Odysseus URL</label><input value="http://192.168.68.84:7000"></div>
+          <div class="row" style="justify-content:space-between;">
+            <span>Krev innlogging før åpning</span>
+            <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+          </div>
+          <button class="btn" onclick="alert('Validerer http://… → lagrer → tilbake til hovedskjerm og laster på nytt')">Lagre</button>
+        </div>
+      </div>
+    </div></div>
+    <div class="label">3 · SettingsActivity</div>
+  </div>
+
+  <!-- ===== FEILSIDE ===== -->
+  <div>
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>09:41</span><span>▮▮▮ 100%</span></div>
+      <div class="toolbar"><span>Odysseus</span><span class="dots">⋮</span></div>
+      <div class="body">
+        <div class="errpage">
+          <h2 style="margin:0 0 8px;">Kan ikke nå Odysseus</h2>
+          <p style="color:#555;font-size:14px;">Fikk ikke kontakt med<br><code>http://192.168.68.84:7000</code></p>
+          <p style="color:#555;font-size:13px;">Sjekk at Odysseus-tjenesten kjører og at du er på samme nett (Tailscale).</p>
+          <button class="btn" style="max-width:160px;margin:24px auto 0;">Prøv igjen</button>
+        </div>
+      </div>
+    </div></div>
+    <div class="label">4 · Feilside (server nede)</div>
+  </div>
+
+</div>
+</body>
+</html>
