@@ -2,7 +2,7 @@
 <!--
     main_menu.xml
     The overflow (three-dot) menu shown in the toolbar on the main
-    screen: Reload the page, or open Settings.
+    screen: Reload, toggle Agent Mode, Shell Access, or open Settings.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -10,6 +10,19 @@
     <item
         android:id="@+id/action_reload"
         android:title="@string/menu_reload"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_agent_mode"
+        android:title="@string/menu_agent_mode"
+        android:checkable="true"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_shell_access"
+        android:title="@string/menu_shell_access"
+        android:checkable="true"
+        android:enabled="false"
         app:showAsAction="never" />
 
     <item

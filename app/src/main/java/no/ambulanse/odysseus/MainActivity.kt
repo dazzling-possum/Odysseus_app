@@ -26,6 +26,8 @@ import no.ambulanse.odysseus.databinding.ActivityMainBinding
  *   3. Sends HTTP Basic Auth credentials to the Odysseus server.
  *   4. Supports pull-to-refresh and hardware/gesture back navigation.
  *   5. Shows a friendly error page if the server cannot be reached.
+ *   6. Supports Agent Mode (?agent=true) with optional Shell Access
+ *      (&shell=true) for executing commands on the server.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -39,10 +41,16 @@ class MainActivity : AppCompatActivity() {
     private var authUser: String = ""
     private var authPass: String = ""
 
+    // Track whether the internal chat scroll container (#chat-history)
+    // is at the very top. Updated by JS via OdysseusBridge.
+    private var chatIsAtTop = true
+
     // The settings that are currently reflected in the loaded page, so
     // onResume() can tell when the user changed them in Settings.
     private var appliedUrl: String? = null
     private var appliedUseLogin: Boolean? = null
+    private var appliedUseAgent: Boolean? = null
+    private var appliedUseShellAccess: Boolean? = null
 
     // Launcher for the optional LoginActivity. When it returns OK we
     // pull the entered credentials and load the page with them.
@@ -78,6 +86,8 @@ class MainActivity : AppCompatActivity() {
             // detected correctly in onResume().
             appliedUrl = prefs.url
             appliedUseLogin = prefs.useLogin
+            appliedUseAgent = prefs.useAgent
+            appliedUseShellAccess = prefs.useShellAccess
         } else {
             startUpFlow()
         }
@@ -87,6 +97,8 @@ class MainActivity : AppCompatActivity() {
     private fun startUpFlow() {
         appliedUrl = prefs.url
         appliedUseLogin = prefs.useLogin
+        appliedUseAgent = prefs.useAgent
+        appliedUseShellAccess = prefs.useShellAccess
         if (prefs.useLogin) {
             // If "remember me" saved valid credentials, reuse them.
             if (prefs.rememberMe && prefs.hasSavedCredentials()) {
@@ -107,6 +119,15 @@ class MainActivity : AppCompatActivity() {
         val web = binding.webView
         web.settings.apply {
             javaScriptEnabled = true                 // chat UI needs JS
+
+        // Bridge so the chat page can tell us when the user has scrolled
+        // the internal #chat-history container.
+        web.addJavascriptInterface(object {
+            @android.webkit.JavascriptInterface
+            fun setChatScrollTop(scrollTop: Int) {
+                chatIsAtTop = scrollTop <= 0
+            }
+        }, "OdysseusBridge")
             domStorageEnabled = true                 // localStorage/session
             // Allow a HTTPS page to load HTTP sub-resources and vice
             // versa (useful on a mixed local network).
@@ -131,9 +152,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Pull down on the page to reload it. */
+    /** Pull down on the page to reload it – only when at the top. */
     private fun setupSwipeRefresh() {
         binding.swipeRefresh.setColorSchemeResources(R.color.odysseus_primary)
+        // Kun tillat pull-to-refresh når WebView er scrollet helt til toppen
+        binding.swipeRefresh.setOnChildScrollUpCallback { _, _ ->
+            !chatIsAtTop
+        }
         binding.swipeRefresh.setOnRefreshListener {
             binding.webView.reload()
         }
@@ -156,9 +181,10 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    /** Load the saved Odysseus URL, attaching auth headers if present. */
+    /** Load the Odysseus URL with auth headers, using buildUrl() which
+     *  appends ?agent=true and &shell=true as configured. */
     private fun loadOdysseus() {
-        val url = prefs.url
+        val url = prefs.buildUrl()
         val header = if (authUser.isNotEmpty()) {
             // Send Basic Auth on the very first request as well, so
             // servers that expect the header up-front are satisfied.
@@ -177,17 +203,44 @@ class MainActivity : AppCompatActivity() {
         return "Basic $encoded"
     }
 
-    // ---- Toolbar menu (Reload / Settings) ---------------------------
+    // ---- Toolbar menu (Reload / Agent Mode / Shell Access / Settings)
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        menu.findItem(R.id.action_agent_mode)?.isChecked = prefs.useAgent
+        menu.findItem(R.id.action_shell_access)?.isChecked = prefs.useShellAccess
+        // Shell access is only meaningful with agent mode
+        menu.findItem(R.id.action_shell_access)?.isEnabled = prefs.useAgent
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_reload -> {
                 binding.webView.reload(); true
+            }
+            R.id.action_agent_mode -> {
+                prefs.useAgent = !prefs.useAgent
+                item.isChecked = prefs.useAgent
+                // Turn off shell access if agent mode is turned off
+                if (!prefs.useAgent) {
+                    prefs.useShellAccess = false
+                }
+                invalidateOptionsMenu()
+                loadOdysseus()
+                true
+            }
+            R.id.action_shell_access -> {
+                if (prefs.useAgent) {
+                    prefs.useShellAccess = !prefs.useShellAccess
+                    item.isChecked = prefs.useShellAccess
+                    loadOdysseus()
+                }
+                true
             }
             R.id.action_settings -> {
                 startActivity(SettingsActivity.intent(this)); true
@@ -196,11 +249,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Re-run the startup flow if the URL or login setting changed. */
+    /** Re-run the startup flow if the URL, login, agent, or shell
+     *  access setting changed. */
     override fun onResume() {
         super.onResume()
         val changed = appliedUrl != null &&
-            (appliedUrl != prefs.url || appliedUseLogin != prefs.useLogin)
+            (appliedUrl != prefs.url ||
+             appliedUseLogin != prefs.useLogin ||
+             appliedUseAgent != prefs.useAgent ||
+             appliedUseShellAccess != prefs.useShellAccess)
         if (changed) {
             startUpFlow()
         }
@@ -230,13 +287,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onReceivedHttpAuthRequest(
-            view: WebView,
-            handler: HttpAuthHandler,
-            host: String,
-            realm: String
+            view: WebView, handler: HttpAuthHandler,
+            host: String, realm: String
         ) {
-            // This is the proper way HTTP Basic Auth works in a WebView:
-            // when the server responds with 401, supply the credentials.
             if (authUser.isNotEmpty()) {
                 handler.proceed(authUser, authPass)
             } else {
@@ -250,48 +303,36 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onReceivedError(
-            view: WebView,
-            request: WebResourceRequest,
-            error: WebResourceError
+            view: WebView?, request: WebResourceRequest?,
+            error: WebResourceError?
         ) {
-            super.onReceivedError(view, request, error)
-            // Only show the error page for the main page, not for a
-            // failed image or script inside an otherwise-loaded page.
-            if (request.isForMainFrame) {
-                binding.swipeRefresh.isRefreshing = false
-                showErrorPage(view, prefs.url)
+            // Show an embedded error page when the main page fails
+            // (e.g. server unreachable). Sub-resource errors are
+            // silently ignored so they don't replace the page.
+            if (request?.isForMainFrame == true) {
+                val desc = error?.description?.toString()
+                    ?: getString(R.string.error_title)
+                val html = ERROR_HTML
+                    .replace("{{TITLE}}", getString(R.string.error_title))
+                    .replace("{{DESC}}", desc)
+                view?.loadDataWithBaseURL(null, html,
+                    "text/html", "UTF-8", null)
             }
         }
     }
 
-    /** Render a simple, branded error page directly in the WebView. */
-    private fun showErrorPage(view: WebView, failedUrl: String) {
-        val html = """
-            <!DOCTYPE html>
-            <html><head><meta name="viewport"
-              content="width=device-width, initial-scale=1">
-            <style>
-              body{font-family:sans-serif;background:#fff;color:#003366;
-                   text-align:center;padding:48px 24px;}
-              h1{font-size:22px;margin-bottom:8px;}
-              p{color:#555;font-size:15px;}
-              code{background:#eee;padding:2px 6px;border-radius:4px;}
-              button{margin-top:24px;background:#003366;color:#fff;
-                     border:none;padding:12px 24px;border-radius:8px;
-                     font-size:16px;}
-            </style></head>
-            <body>
-              <h1>${getString(R.string.error_title)}</h1>
-              <p>Could not connect to<br><code>$failedUrl</code></p>
-              <p>Check that the Odysseus service is running and that
-                 you are on the same network (Tailscale).</p>
-              <button onclick="window.location.href='$failedUrl'">Retry</button>
-            </body></html>
-        """.trimIndent()
-        view.loadDataWithBaseURL(failedUrl, html, "text/html", "UTF-8", failedUrl)
-    }
-
     companion object {
-        private const val USER_AGENT = "OdysseusApp/1.0 (Android; Mobile)"
+        /** Custom User-Agent sent with every request. */
+        const val USER_AGENT = "Odysseus-Android-App/1.0"
+
+        /** Minimal error page shown in the WebView on failure. */
+        const val ERROR_HTML = """
+<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width,initial-scale=1.0,user-scalable=no'>
+<style>body{font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;
+height:100vh;margin:0;padding:24px;background:#f5f5f5;color:#333;text-align:center}
+h2{color:#c62828}h2:before{content:'⚠️ '}p{max-width:320px;line-height:1.5;color:#555}
+small{color:#999;margin-top:12px}</style></head>
+<body><h2>{{TITLE}}</h2><p>{{DESC}}</p>
+<small>Odysseus Android App — pull down to retry</small></body></html>"""
     }
 }

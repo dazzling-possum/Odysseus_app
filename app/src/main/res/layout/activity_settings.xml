@@ -6,6 +6,8 @@
       * See the currently saved URL.
       * Type a new URL.
       * Toggle whether a login screen is required.
+      * Toggle Agent Mode.
+      * Toggle Shell Access (requires Agent Mode).
       * Save (validates the URL, then returns to the main screen).
     A branded toolbar sits on top; the form is in a ScrollView so it
     stays usable on small screens / when the keyboard is open.
@@ -71,6 +73,39 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/settings_use_login"
                 android:textColor="@color/black" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/useAgentSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_agent_mode"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/settings_agent_mode_desc"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/useShellAccessSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_shell_access"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/shellAccessDescText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/settings_shell_access_desc"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/saveButton"

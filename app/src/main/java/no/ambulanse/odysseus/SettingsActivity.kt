@@ -10,8 +10,9 @@ import no.ambulanse.odysseus.databinding.ActivitySettingsBinding
 /**
  * SettingsActivity
  * ---------------------------------------------------------------------
- * Lets the user view and change the Odysseus URL and toggle whether a
- * login screen is required. On Save it validates the URL, stores the
+ * Lets the user view and change the Odysseus URL, toggle whether a
+ * login screen is required, enable agent mode, and enable shell access
+ * (which requires agent mode). On Save it validates the URL, stores the
  * values, and returns to MainActivity (which reloads the WebView).
  */
 class SettingsActivity : AppCompatActivity() {
@@ -33,8 +34,27 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.settings_current_url, prefs.url)
         binding.urlInput.setText(prefs.url)
         binding.useLoginSwitch.isChecked = prefs.useLogin
+        binding.useAgentSwitch.isChecked = prefs.useAgent
+        binding.useShellAccessSwitch.isChecked = prefs.useShellAccess
+
+        // Shell access requires agent mode – disable when agent is off
+        updateShellAccessState()
+
+        // When agent mode is toggled, update shell access availability
+        binding.useAgentSwitch.setOnCheckedChangeListener { _, _ ->
+            updateShellAccessState()
+        }
 
         binding.saveButton.setOnClickListener { save() }
+    }
+
+    private fun updateShellAccessState() {
+        val agentOn = binding.useAgentSwitch.isChecked
+        binding.useShellAccessSwitch.isEnabled = agentOn
+        if (!agentOn) {
+            binding.useShellAccessSwitch.isChecked = false
+        }
+        binding.shellAccessDescText.alpha = if (agentOn) 1.0f else 0.4f
     }
 
     private fun save() {
@@ -50,6 +70,8 @@ class SettingsActivity : AppCompatActivity() {
         // Save the values.
         prefs.url = newUrl
         prefs.useLogin = binding.useLoginSwitch.isChecked
+        prefs.useAgent = binding.useAgentSwitch.isChecked
+        prefs.useShellAccess = binding.useShellAccessSwitch.isChecked
 
         Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_SHORT).show()
 
