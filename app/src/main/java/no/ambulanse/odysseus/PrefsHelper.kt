@@ -65,17 +65,31 @@ class PrefsHelper(context: Context) {
 
     /**
      * Builds the full URL with any active mode suffixes.
-     * Agent mode adds ?agent=true, shell access adds &shell=true.
+     * Agent mode adds agent=true, shell access adds shell=true.
+     *
+     * The separator (? vs &) is chosen based on whether the saved URL
+     * already contains a query string, so a custom URL like
+     * "http://host:7000/?foo=bar" stays valid instead of getting a
+     * second "?" appended.
      */
     fun buildUrl(): String {
-        var u = url
-        if (useAgent) {
-            u += agentSuffix
-            if (useShellAccess) {
-                u += "&shell=true"
-            }
+        if (!useAgent) return url
+
+        // agentSuffix is stored with its own leading "?"/"&" (e.g.
+        // "?agent=true"); strip it so we control the separator here.
+        var u = appendQuery(url, agentSuffix.trimStart('?', '&'))
+        if (useShellAccess) {
+            u = appendQuery(u, "shell=true")
         }
         return u
+    }
+
+    /** Append a "key=value" query string to a URL, using "?" when the
+     *  URL has no query yet and "&" otherwise. Blank params are ignored. */
+    private fun appendQuery(url: String, params: String): String {
+        if (params.isEmpty()) return url
+        val separator = if (url.contains('?')) "&" else "?"
+        return url + separator + params
     }
 
     // ---- "Remember me" ------------------------------------------------
