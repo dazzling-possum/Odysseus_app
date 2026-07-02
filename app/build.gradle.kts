@@ -122,4 +122,9 @@ dependencies {
 
     // Lets us use the modern OnBackPressedCallback API.
     implementation("androidx.activity:activity-ktx:1.9.1")
+
+    // SSH client for the built-in terminal. This is the maintained
+    // fork of JSch (drop-in, same com.jcraft.jsch package) with modern
+    // crypto/host-key algorithms needed to reach current OpenSSH servers.
+    implementation("com.github.mwiede:jsch:0.2.17")
 }

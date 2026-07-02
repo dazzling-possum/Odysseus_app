@@ -151,6 +151,60 @@ class PrefsHelper(context: Context) {
         return "Basic $encoded"
     }
 
+    // ---- SSH terminal connection ------------------------------------
+    //
+    // Host/port/user are stored in clear; the password, private key and
+    // passphrase are lightly obfuscated (same caveat as above — use
+    // EncryptedSharedPreferences for production).
+
+    var sshHost: String
+        get() = prefs.getString(KEY_SSH_HOST, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_SSH_HOST, value).apply()
+
+    var sshPort: Int
+        get() = prefs.getInt(KEY_SSH_PORT, 22)
+        set(value) = prefs.edit().putInt(KEY_SSH_PORT, value).apply()
+
+    var sshUser: String
+        get() = prefs.getString(KEY_SSH_USER, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_SSH_USER, value).apply()
+
+    /** true = authenticate with a private key, false = password. */
+    var sshUseKey: Boolean
+        get() = prefs.getBoolean(KEY_SSH_USE_KEY, false)
+        set(value) = prefs.edit().putBoolean(KEY_SSH_USE_KEY, value).apply()
+
+    var sshPassword: String
+        get() = deobfuscate(prefs.getString(KEY_SSH_PASS, "") ?: "")
+        set(value) = prefs.edit().putString(KEY_SSH_PASS, obfuscate(value)).apply()
+
+    var sshPrivateKey: String
+        get() = deobfuscate(prefs.getString(KEY_SSH_KEY, "") ?: "")
+        set(value) = prefs.edit().putString(KEY_SSH_KEY, obfuscate(value)).apply()
+
+    var sshPassphrase: String
+        get() = deobfuscate(prefs.getString(KEY_SSH_PASSPHRASE, "") ?: "")
+        set(value) = prefs.edit().putString(KEY_SSH_PASSPHRASE, obfuscate(value)).apply()
+
+    var sshRemember: Boolean
+        get() = prefs.getBoolean(KEY_SSH_REMEMBER, true)
+        set(value) = prefs.edit().putBoolean(KEY_SSH_REMEMBER, value).apply()
+
+    /** Enough to attempt a connection without asking again. */
+    fun hasSshConfig(): Boolean {
+        if (sshHost.isEmpty() || sshUser.isEmpty()) return false
+        return if (sshUseKey) sshPrivateKey.isNotEmpty()
+        else sshPassword.isNotEmpty()
+    }
+
+    fun clearSshSecrets() {
+        prefs.edit()
+            .remove(KEY_SSH_PASS)
+            .remove(KEY_SSH_KEY)
+            .remove(KEY_SSH_PASSPHRASE)
+            .apply()
+    }
+
     // ---- Simple obfuscation (XOR with a fixed key, then Base64) ------
 
     private fun obfuscate(plain: String): String {
@@ -191,6 +245,15 @@ class PrefsHelper(context: Context) {
         private const val KEY_PULL_REFRESH = "pull_refresh"
         private const val KEY_USER = "username"
         private const val KEY_PASS = "password"
+
+        private const val KEY_SSH_HOST = "ssh_host"
+        private const val KEY_SSH_PORT = "ssh_port"
+        private const val KEY_SSH_USER = "ssh_user"
+        private const val KEY_SSH_USE_KEY = "ssh_use_key"
+        private const val KEY_SSH_PASS = "ssh_pass"
+        private const val KEY_SSH_KEY = "ssh_key"
+        private const val KEY_SSH_PASSPHRASE = "ssh_passphrase"
+        private const val KEY_SSH_REMEMBER = "ssh_remember"
 
         // Fixed key for the lightweight XOR obfuscation. Not a secret
         // in any real sense — see the security note above.
