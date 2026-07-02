@@ -15,6 +15,8 @@
     <string name="settings_url_label">Odysseus URL</string>
     <string name="settings_url_hint">http://192.168.68.84:7000</string>
     <string name="settings_current_url">Currently saved: %1$s</string>
+    <string name="settings_user_agent">Browser identity (User-Agent)</string>
+    <string name="settings_user_agent_help">Leave the default so the server treats the app like Chrome (needed for the agent\'s shell/bash tool). Clear the field to reset to default.</string>
     <string name="settings_use_login">Require login before opening</string>
     <string name="settings_pull_refresh">Pull down to reload (off for terminal use)</string>
     <string name="settings_show_keys">Show terminal key bar</string>

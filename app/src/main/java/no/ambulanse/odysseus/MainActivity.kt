@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
     private var appliedUseLogin: Boolean? = null
     private var appliedUseAgent: Boolean? = null
     private var appliedUseShellAccess: Boolean? = null
+    private var appliedUserAgent: String? = null
 
     // Sticky modifier state for the terminal key bar.
     private var ctrlActive = false
@@ -126,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         appliedUseLogin = prefs.useLogin
         appliedUseAgent = prefs.useAgent
         appliedUseShellAccess = prefs.useShellAccess
+        appliedUserAgent = prefs.userAgent
     }
 
     /**
@@ -133,6 +135,9 @@ class MainActivity : AppCompatActivity() {
      * Basic Auth header when login is enabled.
      */
     private fun loadOdysseus() {
+        // Always apply the current User-Agent so a change in Settings
+        // takes effect on the next load.
+        binding.webView.settings.userAgentString = prefs.userAgent
         val url = prefs.buildUrl()
         val header = if (authUser.isNotEmpty()) {
             mapOf("Authorization" to basicAuth(authUser, authPass))
@@ -161,7 +166,9 @@ class MainActivity : AppCompatActivity() {
             databaseEnabled = true
             // Allow http/https to mix on the local network (and ws://).
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-            userAgentString = USER_AGENT
+            // Present as a real browser (default: mobile Chrome) so the
+            // server exposes the same tools (incl. bash) as in Chrome.
+            userAgentString = prefs.userAgent
             // A terminal is full-bleed; don't scale it to "overview".
             loadWithOverviewMode = false
             useWideViewPort = true
@@ -378,7 +385,8 @@ class MainActivity : AppCompatActivity() {
             appliedUrl != prefs.url ||
             appliedUseLogin != prefs.useLogin ||
             appliedUseAgent != prefs.useAgent ||
-            appliedUseShellAccess != prefs.useShellAccess
+            appliedUseShellAccess != prefs.useShellAccess ||
+            appliedUserAgent != prefs.userAgent
         )
         if (changed) startUpFlow()
     }
@@ -479,7 +487,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val USER_AGENT = "OdysseusApp/1.0 (Android; Mobile)"
         private const val JS_BRIDGE = "OdysseusAndroid"
 
         /** Route navigator.clipboard through the Android bridge. */

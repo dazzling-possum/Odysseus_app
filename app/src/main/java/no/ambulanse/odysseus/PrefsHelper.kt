@@ -37,6 +37,22 @@ class PrefsHelper(context: Context) {
         get() = prefs.getString(KEY_URL, DEFAULT_URL) ?: DEFAULT_URL
         set(value) = prefs.edit().putString(KEY_URL, value).apply()
 
+    // ---- WebView User-Agent -----------------------------------------
+
+    /**
+     * The User-Agent the WebView presents to Odysseus. It defaults to a
+     * clean, current mobile-Chrome string (no WebView "wv" token, no
+     * custom app name) so the server treats the app exactly like the
+     * phone's Chrome — which is confirmed to expose the shell/bash tool.
+     * Editable in Settings; a blank value falls back to the default.
+     */
+    var userAgent: String
+        get() {
+            val v = prefs.getString(KEY_USER_AGENT, DEFAULT_USER_AGENT) ?: DEFAULT_USER_AGENT
+            return v.ifBlank { DEFAULT_USER_AGENT }
+        }
+        set(value) = prefs.edit().putString(KEY_USER_AGENT, value).apply()
+
     // ---- Login toggle ------------------------------------------------
 
     /** Whether the login screen must be shown before the WebView. */
@@ -180,8 +196,15 @@ class PrefsHelper(context: Context) {
         const val DEFAULT_URL = "http://192.168.68.84:7000"
         const val DEFAULT_AGENT_SUFFIX = "?agent=true"
 
+        // A real, current Android Chrome UA (no embedded-WebView "wv"
+        // token). "K" is Chrome's privacy placeholder device name.
+        const val DEFAULT_USER_AGENT =
+            "Mozilla/5.0 (Linux; Android 14; K) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36"
+
         private const val PREFS_NAME = "odysseus_prefs"
         private const val KEY_URL = "url"
+        private const val KEY_USER_AGENT = "user_agent"
         private const val KEY_USE_LOGIN = "use_login"
         private const val KEY_USE_AGENT = "use_agent"
         private const val KEY_AGENT_SUFFIX = "agent_suffix"

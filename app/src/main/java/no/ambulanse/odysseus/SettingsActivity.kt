@@ -33,6 +33,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.currentUrlText.text =
             getString(R.string.settings_current_url, prefs.url)
         binding.urlInput.setText(prefs.url)
+        binding.userAgentInput.setText(prefs.userAgent)
         binding.useLoginSwitch.isChecked = prefs.useLogin
         binding.showKeysSwitch.isChecked = prefs.showKeyBar
         binding.pullRefreshSwitch.isChecked = prefs.pullToRefresh
@@ -71,6 +72,7 @@ class SettingsActivity : AppCompatActivity() {
 
         // Save the values.
         prefs.url = newUrl
+        prefs.userAgent = binding.userAgentInput.text?.toString()?.trim().orEmpty()
         prefs.useLogin = binding.useLoginSwitch.isChecked
         prefs.showKeyBar = binding.showKeysSwitch.isChecked
         prefs.pullToRefresh = binding.pullRefreshSwitch.isChecked

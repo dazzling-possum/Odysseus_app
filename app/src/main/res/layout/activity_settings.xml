@@ -66,6 +66,31 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/userAgentInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/settings_user_agent"
+                app:boxStrokeColor="@color/odysseus_primary">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/userAgentInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:maxLines="3" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/settings_user_agent_help"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="13sp" />
+
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/useLoginSwitch"
                 android:layout_width="match_parent"
