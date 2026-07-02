@@ -21,6 +21,10 @@
     <string name="settings_save">Save</string>
     <string name="settings_invalid_url">URL must start with http:// or https://</string>
     <string name="settings_saved">Saved. Reloading…</string>
+    <string name="settings_agent_mode">Enable Agent Mode</string>
+    <string name="settings_agent_mode_desc">Load the agent interface instead of the default chat</string>
+    <string name="settings_shell_access">Enable Shell Access</string>
+    <string name="settings_shell_access_desc">Let the agent run shell commands on the server (requires Agent Mode)</string>
 
     <!-- Login screen -->
     <string name="login_title">Sign in to Odysseus</string>
@@ -35,6 +39,8 @@
     <string name="menu_reload">Reload</string>
     <string name="menu_keyboard">Keyboard</string>
     <string name="menu_keys">Terminal keys</string>
+    <string name="menu_agent_mode">Agent Mode</string>
+    <string name="menu_shell_access">Shell Access</string>
 
     <!-- Error page -->
     <string name="error_title">Cannot reach Odysseus</string>

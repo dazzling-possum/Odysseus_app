@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     main_menu.xml
-    Toolbar actions on the main screen. The keyboard and key-bar
-    toggles make the embedded web terminal usable on a phone.
+    Toolbar actions on the main screen:
+      * Keyboard / Terminal keys — make the embedded web terminal usable.
+      * Agent Mode / Shell Access — tell the server which interface to
+        load (?agent=true, &shell=true).
+      * Reload / Settings.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -17,6 +20,19 @@
         android:id="@+id/action_keys"
         android:checkable="true"
         android:title="@string/menu_keys"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_agent_mode"
+        android:checkable="true"
+        android:title="@string/menu_agent_mode"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_shell_access"
+        android:checkable="true"
+        android:enabled="false"
+        android:title="@string/menu_shell_access"
         app:showAsAction="never" />
 
     <item

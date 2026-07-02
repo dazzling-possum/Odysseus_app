@@ -13,6 +13,7 @@ experience without the browser chrome.
 | Feature | Where |
 | --- | --- |
 | Full WebView (JS, DOM storage, mixed content, custom User-Agent) | `MainActivity.kt` |
+| **Agent Mode + Shell Access** toggles (URL flags) | `MainActivity.kt`, `PrefsHelper.buildUrl()` |
 | **Web-terminal support** (key bar, keyboard, clipboard, WebSockets) | `MainActivity.kt`, `TerminalKeys.kt` |
 | Pull-to-refresh (terminal-safe: only at top, toggleable) | `SwipeRefreshLayout` in `activity_main.xml` |
 | Back-button navigation (WebView history, then exit) | `MainActivity.setupBackNavigation()` |
@@ -22,6 +23,21 @@ experience without the browser chrome.
 | Preferences + credential obfuscation + Basic Auth header | `PrefsHelper.kt` |
 | Dark-blue (#003366) / white branding | `themes.xml`, `colors.xml` |
 | Ambulance launcher icon | `res/drawable/ic_launcher_foreground.xml` |
+
+## Agent Mode & Shell Access
+
+Two toggles (in the ⋮ menu and in Settings) tell the Odysseus **server**
+which interface to load, by appending flags to the URL:
+
+- **Agent Mode** → adds `?agent=true` (loads the agent interface instead
+  of the default chat).
+- **Shell Access** → adds `&shell=true` (lets the agent run shell
+  commands on the server). It requires Agent Mode, so it is disabled
+  until Agent Mode is on.
+
+The combined URL is built in `PrefsHelper.buildUrl()`, e.g.
+`http://192.168.68.84:7000?agent=true&shell=true`. Toggling either one
+reloads the page with the new URL.
 
 ## Using the built-in web terminal
 

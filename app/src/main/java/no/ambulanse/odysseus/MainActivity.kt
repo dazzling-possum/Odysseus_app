@@ -29,23 +29,23 @@ import no.ambulanse.odysseus.databinding.ActivityMainBinding
 /**
  * MainActivity
  * ---------------------------------------------------------------------
- * Full-screen host for the Odysseus web app. Beyond a plain WebView it
- * is tuned for running the service's built-in **web terminal** on a
- * phone, which normally fails because a soft keyboard cannot produce
- * Ctrl / Tab / Esc / arrow keys. To fix that it adds:
+ * Full-screen host for the Odysseus web app, tuned for running the
+ * service's shell/agent terminal from a phone.
  *
- *   * a hardened WebView (WebSockets, clipboard bridge, granted web
- *     permissions, autoplay for the terminal bell),
- *   * a scrollable key bar that injects real KeyboardEvents into the
- *     terminal (see TerminalKeys),
- *   * a "show keyboard" action and adjustResize so the keyboard never
- *     covers the terminal,
- *   * pull-to-refresh that only triggers at the very top, so swiping in
- *     the scrollback scrolls instead of reloading (a reload would kill
- *     the shell session).
+ * Two complementary sets of features work together here:
  *
- * It still supports the optional login (HTTP Basic Auth), a branded
- * error page, back-navigation and rotation.
+ *  A) "Get to the shell" — Agent Mode and Shell Access toggles append
+ *     URL flags (?agent=true, &shell=true) so the server loads its agent
+ *     interface and allows the agent to run shell commands. See
+ *     PrefsHelper.buildUrl().
+ *
+ *  B) "Make the shell usable" — a hardened WebView plus a terminal key
+ *     bar (Esc, Tab, Ctrl, arrows, …), a keyboard button and a clipboard
+ *     bridge, because a soft keyboard alone cannot drive a web terminal.
+ *     See TerminalKeys.
+ *
+ * It also supports optional login (HTTP Basic Auth), a branded error
+ * page, back-navigation and rotation.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -57,9 +57,11 @@ class MainActivity : AppCompatActivity() {
     private var authPass: String = ""
 
     // Settings currently reflected on screen, so onResume() can detect
-    // changes made in the Settings screen.
+    // changes made in the Settings screen and reload.
     private var appliedUrl: String? = null
     private var appliedUseLogin: Boolean? = null
+    private var appliedUseAgent: Boolean? = null
+    private var appliedUseShellAccess: Boolean? = null
 
     // Sticky modifier state for the terminal key bar.
     private var ctrlActive = false
@@ -95,8 +97,7 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState != null) {
             binding.webView.restoreState(savedInstanceState)
-            appliedUrl = prefs.url
-            appliedUseLogin = prefs.useLogin
+            recordAppliedSettings()
         } else {
             startUpFlow()
         }
@@ -105,8 +106,7 @@ class MainActivity : AppCompatActivity() {
     // ---- Startup / URL loading --------------------------------------
 
     private fun startUpFlow() {
-        appliedUrl = prefs.url
-        appliedUseLogin = prefs.useLogin
+        recordAppliedSettings()
         if (prefs.useLogin) {
             if (prefs.rememberMe && prefs.hasSavedCredentials()) {
                 authUser = prefs.username
@@ -120,8 +120,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Snapshot the settings that determine what is loaded. */
+    private fun recordAppliedSettings() {
+        appliedUrl = prefs.url
+        appliedUseLogin = prefs.useLogin
+        appliedUseAgent = prefs.useAgent
+        appliedUseShellAccess = prefs.useShellAccess
+    }
+
+    /**
+     * Load the Odysseus URL (with any agent/shell flags), attaching the
+     * Basic Auth header when login is enabled.
+     */
     private fun loadOdysseus() {
-        val url = prefs.url
+        val url = prefs.buildUrl()
         val header = if (authUser.isNotEmpty()) {
             mapOf("Authorization" to basicAuth(authUser, authPass))
         } else {
@@ -302,6 +314,12 @@ class MainActivity : AppCompatActivity() {
         TypedValue.COMPLEX_UNIT_DIP, value.toFloat(), resources.displayMetrics
     ).toInt()
 
+    /** Reload the page after an agent/shell toggle changed the URL. */
+    private fun reloadWithCurrentSettings() {
+        recordAppliedSettings()
+        loadOdysseus()
+    }
+
     // ---- Toolbar menu -----------------------------------------------
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -311,6 +329,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         menu.findItem(R.id.action_keys)?.isChecked = prefs.showKeyBar
+        menu.findItem(R.id.action_agent_mode)?.isChecked = prefs.useAgent
+        menu.findItem(R.id.action_shell_access)?.let {
+            it.isChecked = prefs.useShellAccess
+            // Shell access is only meaningful together with agent mode.
+            it.isEnabled = prefs.useAgent
+        }
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -321,6 +345,21 @@ class MainActivity : AppCompatActivity() {
                 prefs.showKeyBar = !prefs.showKeyBar
                 applyTerminalPrefs()
                 invalidateOptionsMenu()
+                true
+            }
+            R.id.action_agent_mode -> {
+                prefs.useAgent = !prefs.useAgent
+                if (!prefs.useAgent) prefs.useShellAccess = false
+                invalidateOptionsMenu()
+                reloadWithCurrentSettings()
+                true
+            }
+            R.id.action_shell_access -> {
+                if (prefs.useAgent) {
+                    prefs.useShellAccess = !prefs.useShellAccess
+                    invalidateOptionsMenu()
+                    reloadWithCurrentSettings()
+                }
                 true
             }
             R.id.action_reload -> { binding.webView.reload(); true }
@@ -335,8 +374,12 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         // Re-apply terminal options (they may have changed in Settings).
         applyTerminalPrefs()
-        val changed = appliedUrl != null &&
-            (appliedUrl != prefs.url || appliedUseLogin != prefs.useLogin)
+        val changed = appliedUrl != null && (
+            appliedUrl != prefs.url ||
+            appliedUseLogin != prefs.useLogin ||
+            appliedUseAgent != prefs.useAgent ||
+            appliedUseShellAccess != prefs.useShellAccess
+        )
         if (changed) startUpFlow()
     }
 
@@ -404,7 +447,7 @@ class MainActivity : AppCompatActivity() {
             super.onReceivedError(view, request, error)
             if (request.isForMainFrame) {
                 binding.swipeRefresh.isRefreshing = false
-                showErrorPage(view, prefs.url)
+                showErrorPage(view, prefs.buildUrl())
             }
         }
     }

@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     ic_launcher_foreground.xml
-    A simple ambulance drawn as a vector (no image file needed, so it
-    stays crisp at every screen density). It shows:
-      * a white ambulance body
-      * a red medical cross on the side
-      * two wheels
-    The viewport is 108x108 (the standard adaptive-icon canvas); the
-    art is kept inside the safe central area so the launcher can mask
-    it into a circle/squircle.
+    En søt tegneserie-ugle (cartoon owl) – perfekt for Odysseus!
+    Viewport: 108 x 108. Hold tegningen innenfor det trygge senterområdet
+    (~18dp margin) så launcheren kan maskere den til sirkel/squircle.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -16,28 +11,84 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Ambulance body (white box) -->
+    <!-- Kropp (brun oval) -->
+    <path
+        android:fillColor="#8B5E3C"
+        android:pathData="M28,38 Q28,80 54,80 Q80,80 80,38 Q80,28 54,28 Q28,28 28,38 Z" />
+
+    <!-- Mage (lysere brun oval) -->
+    <path
+        android:fillColor="#D4A96A"
+        android:pathData="M35,44 Q35,74 54,74 Q73,74 73,44 Q73,36 54,36 Q35,36 35,44 Z" />
+
+    <!-- Venstre øye (stort, hvitt) -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M26,46 h38 v18 h14 l8,10 v8 h-60 z" />
+        android:pathData="M36,38 m-10,0 a12,11 0 1,0 20,0 a12,11 0 1,0 -20,0" />
 
-    <!-- Driver cabin window -->
+    <!-- Høyre øye (stort, hvitt) -->
     <path
-        android:fillColor="#9FC6E7"
-        android:pathData="M66,50 h8 l6,8 h-14 z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M72,38 m-10,0 a12,11 0 1,0 20,0 a12,11 0 1,0 -20,0" />
 
-    <!-- Red medical cross on the side of the van -->
-    <path
-        android:fillColor="#D32F2F"
-        android:pathData="M40,50 h6 v5 h5 v6 h-5 v5 h-6 v-5 h-5 v-6 h5 z" />
-
-    <!-- Rear wheel -->
+    <!-- Venstre pupill (svart) -->
     <path
         android:fillColor="#222222"
-        android:pathData="M38,82 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+        android:pathData="M40,40 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
 
-    <!-- Front wheel -->
+    <!-- Høyre pupill (svart) -->
     <path
         android:fillColor="#222222"
-        android:pathData="M70,82 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+        android:pathData="M68,40 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
+
+    <!-- Øyeglans venstre (liten hvit prikk) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,37 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+    <!-- Øyeglans høyre (liten hvit prikk) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M70,37 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+    <!-- Nebb (oransje diamant) -->
+    <path
+        android:fillColor="#FF8C00"
+        android:pathData="M52,47 l4,-7 l4,7 Z" />
+
+    <!-- Venstre vinge -->
+    <path
+        android:fillColor="#6B4226"
+        android:pathData="M24,44 Q18,52 22,60 Q26,52 28,46 Z" />
+
+    <!-- Høyre vinge -->
+    <path
+        android:fillColor="#6B4226"
+        android:pathData="M84,44 Q90,52 86,60 Q82,52 80,46 Z" />
+
+    <!-- Venstre fot (oransje) -->
+    <path
+        android:fillColor="#FF8C00"
+        android:pathData="M40,78 l-4,8 l4,-2 l3,5 l1,-6 l4,-1 l-4,-2 l-2,-4 Z" />
+
+    <!-- Høyre fot (oransje) -->
+    <path
+        android:fillColor="#FF8C00"
+        android:pathData="M68,78 l-4,8 l4,-2 l3,5 l1,-6 l4,-1 l-4,-2 l-2,-4 Z" />
+
+    <!-- Øyenbryn/ører (små fjærtuster på toppen) -->
+    <path
+        android:fillColor="#6B4226"
+        android:pathData="M34,28 l4,-6 l4,4 Z" />
+
+    <path
+        android:fillColor="#6B4226"
+        android:pathData="M66,28 l4,-6 l4,4 Z" />
+
+    <!-- Smil -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#6B4226"
+        android:strokeWidth="1.5"
+        android:pathData="M48,58 Q54,64 60,58" />
 </vector>

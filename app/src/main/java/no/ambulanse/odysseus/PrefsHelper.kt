@@ -12,7 +12,9 @@ import android.util.Base64
  *   * the Odysseus URL,
  *   * whether the login screen is required,
  *   * the saved username / password (lightly obfuscated),
- *   * the "remember me" choice.
+ *   * the "remember me" choice,
+ *   * agent mode toggle and suffix,
+ *   * shell access toggle (requires agent mode).
  *
  * It also builds the HTTP Basic Authentication header used by the
  * WebView when login is enabled.
@@ -42,7 +44,41 @@ class PrefsHelper(context: Context) {
         get() = prefs.getBoolean(KEY_USE_LOGIN, false)
         set(value) = prefs.edit().putBoolean(KEY_USE_LOGIN, value).apply()
 
-    // ---- "Remember me" ----------------------------------------------
+    // ---- Agent mode --------------------------------------------------
+
+    /** Whether agent mode is enabled (loads agent interface). */
+    var useAgent: Boolean
+        get() = prefs.getBoolean(KEY_USE_AGENT, false)
+        set(value) = prefs.edit().putBoolean(KEY_USE_AGENT, value).apply()
+
+    /** URL suffix appended when agent mode is active. */
+    var agentSuffix: String
+        get() = prefs.getString(KEY_AGENT_SUFFIX, DEFAULT_AGENT_SUFFIX) ?: DEFAULT_AGENT_SUFFIX
+        set(value) = prefs.edit().putString(KEY_AGENT_SUFFIX, value).apply()
+
+    // ---- Shell access (requires agent mode) --------------------------
+
+    /** Whether shell access is enabled (only meaningful with agent mode). */
+    var useShellAccess: Boolean
+        get() = prefs.getBoolean(KEY_USE_SHELL_ACCESS, false)
+        set(value) = prefs.edit().putBoolean(KEY_USE_SHELL_ACCESS, value).apply()
+
+    /**
+     * Builds the full URL with any active mode suffixes.
+     * Agent mode adds ?agent=true, shell access adds &shell=true.
+     */
+    fun buildUrl(): String {
+        var u = url
+        if (useAgent) {
+            u += agentSuffix
+            if (useShellAccess) {
+                u += "&shell=true"
+            }
+        }
+        return u
+    }
+
+    // ---- "Remember me" ------------------------------------------------
 
     var rememberMe: Boolean
         get() = prefs.getBoolean(KEY_REMEMBER, false)
@@ -128,10 +164,14 @@ class PrefsHelper(context: Context) {
 
     companion object {
         const val DEFAULT_URL = "http://192.168.68.84:7000"
+        const val DEFAULT_AGENT_SUFFIX = "?agent=true"
 
         private const val PREFS_NAME = "odysseus_prefs"
         private const val KEY_URL = "url"
         private const val KEY_USE_LOGIN = "use_login"
+        private const val KEY_USE_AGENT = "use_agent"
+        private const val KEY_AGENT_SUFFIX = "agent_suffix"
+        private const val KEY_USE_SHELL_ACCESS = "use_shell_access"
         private const val KEY_REMEMBER = "remember_me"
         private const val KEY_SHOW_KEYS = "show_keys"
         private const val KEY_PULL_REFRESH = "pull_refresh"
