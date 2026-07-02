@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     main_menu.xml
-    The overflow (three-dot) menu shown in the toolbar on the main
-    screen: Reload the page, or open Settings.
+    Toolbar actions on the main screen. The keyboard and key-bar
+    toggles make the embedded web terminal usable on a phone.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_keyboard"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="@string/menu_keyboard"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_keys"
+        android:checkable="true"
+        android:title="@string/menu_keys"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_reload"

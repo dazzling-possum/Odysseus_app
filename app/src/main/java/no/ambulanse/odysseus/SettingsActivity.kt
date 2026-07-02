@@ -33,6 +33,8 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.settings_current_url, prefs.url)
         binding.urlInput.setText(prefs.url)
         binding.useLoginSwitch.isChecked = prefs.useLogin
+        binding.showKeysSwitch.isChecked = prefs.showKeyBar
+        binding.pullRefreshSwitch.isChecked = prefs.pullToRefresh
 
         binding.saveButton.setOnClickListener { save() }
     }
@@ -50,6 +52,8 @@ class SettingsActivity : AppCompatActivity() {
         // Save the values.
         prefs.url = newUrl
         prefs.useLogin = binding.useLoginSwitch.isChecked
+        prefs.showKeyBar = binding.showKeysSwitch.isChecked
+        prefs.pullToRefresh = binding.pullRefreshSwitch.isChecked
 
         Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_SHORT).show()
 

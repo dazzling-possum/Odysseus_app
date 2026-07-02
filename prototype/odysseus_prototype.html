@@ -56,6 +56,17 @@
   .composer input{flex:1; border:1px solid #ccc; border-radius:18px; padding:8px 12px; font-size:13px;}
   .composer button{background:var(--blue); color:#fff; border:none; border-radius:18px; padding:0 16px;}
 
+  /* Terminal (svart skjerm) + tastelinje */
+  .term{background:#0b0b0b; color:#33ff66; font-family:monospace; font-size:12px;
+    padding:10px; flex:1; overflow:auto; line-height:1.5;}
+  .term .cmd{color:#8fd0ff;}
+  .term .cur{background:#33ff66; color:#0b0b0b;}
+  .keybar{display:flex; gap:5px; overflow-x:auto; background:var(--blue-dark);
+    padding:6px; white-space:nowrap;}
+  .keybar span{background:#14304f; color:#fff; border-radius:6px; padding:6px 10px;
+    font-size:12px; font-family:monospace; flex:0 0 auto;}
+  .keybar span.mod{background:#2A6FB0;}
+
   /* Skjema (login / settings) */
   .form{padding:22px;}
   .icon{width:84px; height:84px; margin:6px auto 14px; display:block;}
@@ -85,7 +96,7 @@
 </head>
 <body>
 <h1>Odysseus</h1>
-<p class="sub">Interaktiv prototype – klikk i appen for å navigere (Logg inn → Hovedskjerm → Innstillinger). Dette er en HTML-simulering av Android-appen.</p>
+<p class="sub">Interaktiv prototype av Android-appen. Skjerm 3 viser terminal-modus med tastelinjen (Esc, Tab, Ctrl, piltaster …) som gjør shell-tilgang brukbar på mobil.</p>
 
 <div class="stage">
 
@@ -131,7 +142,31 @@
       </div>
       <div class="composer"><input placeholder="Skriv en melding…"><button>➤</button></div>
     </div></div>
-    <div class="label">2 · MainActivity (WebView)</div>
+    <div class="label">2 · MainActivity (WebView – chat)</div>
+  </div>
+
+  <!-- ===== TERMINAL-MODUS ===== -->
+  <div>
+    <div class="phone"><div class="screen">
+      <div class="statusbar"><span>09:41</span><span>▮▮▮ 100%</span></div>
+      <div class="toolbar"><span>Odysseus</span><span><span style="font-size:15px;margin-right:12px;">⌨</span><span class="dots">⋮</span></span></div>
+      <div class="term">
+        <div><span class="cmd">odysseus@lan</span>:~$ uptime</div>
+        <div> 09:41:02 up 3 days,  2:14,  1 user</div>
+        <div><span class="cmd">odysseus@lan</span>:~$ ./agent run --task deploy</div>
+        <div>▶ starter agent-oppdrag …</div>
+        <div>✔ steg 1/3 ferdig</div>
+        <div>✔ steg 2/3 ferdig</div>
+        <div><span class="cmd">odysseus@lan</span>:~$ <span class="cur">&nbsp;</span></div>
+      </div>
+      <!-- tastelinjen som gjør shell brukbart på mobil -->
+      <div class="keybar">
+        <span>ESC</span><span>TAB</span><span class="mod">CTRL</span><span class="mod">ALT</span>
+        <span>↑</span><span>↓</span><span>←</span><span>→</span>
+        <span>^C</span><span>|</span><span>~</span><span>/</span>
+      </div>
+    </div></div>
+    <div class="label">3 · Terminal + tastelinje</div>
   </div>
 
   <!-- ===== SETTINGS ===== -->
@@ -147,11 +182,19 @@
             <span>Krev innlogging før åpning</span>
             <label class="switch"><input type="checkbox"><span class="slider"></span></label>
           </div>
+          <div class="row" style="justify-content:space-between;">
+            <span>Vis terminal-tastelinje</span>
+            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="row" style="justify-content:space-between;">
+            <span>Dra ned for å laste på nytt</span>
+            <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+          </div>
           <button class="btn" onclick="alert('Validerer http://… → lagrer → tilbake til hovedskjerm og laster på nytt')">Lagre</button>
         </div>
       </div>
     </div></div>
-    <div class="label">3 · SettingsActivity</div>
+    <div class="label">4 · SettingsActivity</div>
   </div>
 
   <!-- ===== FEILSIDE ===== -->
@@ -168,7 +211,7 @@
         </div>
       </div>
     </div></div>
-    <div class="label">4 · Feilside (server nede)</div>
+    <div class="label">5 · Feilside (server nede)</div>
   </div>
 
 </div>

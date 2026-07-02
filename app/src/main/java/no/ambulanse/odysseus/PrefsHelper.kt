@@ -48,6 +48,26 @@ class PrefsHelper(context: Context) {
         get() = prefs.getBoolean(KEY_REMEMBER, false)
         set(value) = prefs.edit().putBoolean(KEY_REMEMBER, value).apply()
 
+    // ---- Terminal-friendly options ----------------------------------
+
+    /**
+     * Whether the terminal key bar (Esc, Tab, Ctrl, arrows, …) is shown.
+     * Defaults ON, since the app's main purpose is running shell/agent
+     * tasks in the Odysseus web terminal.
+     */
+    var showKeyBar: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_KEYS, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_KEYS, value).apply()
+
+    /**
+     * Whether pull-to-refresh is active. Defaults OFF because a reload
+     * would kill a live terminal session; a swipe down in the scrollback
+     * must scroll, not reload.
+     */
+    var pullToRefresh: Boolean
+        get() = prefs.getBoolean(KEY_PULL_REFRESH, false)
+        set(value) = prefs.edit().putBoolean(KEY_PULL_REFRESH, value).apply()
+
     // ---- Credentials (lightly obfuscated) ---------------------------
 
     var username: String
@@ -113,6 +133,8 @@ class PrefsHelper(context: Context) {
         private const val KEY_URL = "url"
         private const val KEY_USE_LOGIN = "use_login"
         private const val KEY_REMEMBER = "remember_me"
+        private const val KEY_SHOW_KEYS = "show_keys"
+        private const val KEY_PULL_REFRESH = "pull_refresh"
         private const val KEY_USER = "username"
         private const val KEY_PASS = "password"
 

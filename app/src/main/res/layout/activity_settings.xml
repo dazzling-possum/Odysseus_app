@@ -72,6 +72,22 @@
                 android:text="@string/settings_use_login"
                 android:textColor="@color/black" />
 
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showKeysSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_show_keys"
+                android:textColor="@color/black" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/pullRefreshSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_pull_refresh"
+                android:textColor="@color/black" />
+
             <Button
                 android:id="@+id/saveButton"
                 android:layout_width="match_parent"

@@ -13,14 +13,37 @@ experience without the browser chrome.
 | Feature | Where |
 | --- | --- |
 | Full WebView (JS, DOM storage, mixed content, custom User-Agent) | `MainActivity.kt` |
-| Pull-to-refresh | `SwipeRefreshLayout` in `activity_main.xml` |
+| **Web-terminal support** (key bar, keyboard, clipboard, WebSockets) | `MainActivity.kt`, `TerminalKeys.kt` |
+| Pull-to-refresh (terminal-safe: only at top, toggleable) | `SwipeRefreshLayout` in `activity_main.xml` |
 | Back-button navigation (WebView history, then exit) | `MainActivity.setupBackNavigation()` |
 | Friendly error page when the server is unreachable | `MainActivity.showErrorPage()` |
-| Settings screen (edit/validate/save URL, toggle login) | `SettingsActivity.kt` |
+| Settings screen (URL, login, key bar, pull-to-refresh) | `SettingsActivity.kt` |
 | Optional login (Basic Auth) with "Remember me" | `LoginActivity.kt` |
 | Preferences + credential obfuscation + Basic Auth header | `PrefsHelper.kt` |
 | Dark-blue (#003366) / white branding | `themes.xml`, `colors.xml` |
 | Ambulance launcher icon | `res/drawable/ic_launcher_foreground.xml` |
+
+## Using the built-in web terminal
+
+The Odysseus service exposes its own shell/agent terminal in the web UI.
+A web terminal (xterm.js / ttyd / wetty …) is hard to use on a phone
+because the soft keyboard has no Ctrl, Tab, Esc or arrow keys. This app
+solves that:
+
+- **Terminal key bar** — a scrollable row of special keys (Esc, Tab,
+  Ctrl, Alt, arrows, ^C ^D ^Z ^L, `|` `~` `/` `\` `-`, Home/End, PgUp/PgDn).
+  Tapping a key injects a real `KeyboardEvent` into the terminal.
+  **Ctrl** and **Alt** are sticky: tap Ctrl, then C to send `Ctrl+C`.
+  Toggle the bar from the ⋮ menu ("Terminal keys") or in Settings.
+- **Keyboard button** (⋮ menu / toolbar) — force-shows the soft keyboard
+  if tapping the terminal doesn't bring it up.
+- **Clipboard bridge** — copy/paste works even over plain `http://`,
+  where the browser's `navigator.clipboard` is normally blocked.
+- **Pull-to-refresh is off by default** so a swipe never reloads (which
+  would kill your shell session). Turn it on in Settings if you want it;
+  even then it only fires when the page is scrolled to the very top.
+- The layout uses `adjustResize`, so the keyboard never covers the
+  terminal, and the key bar sits directly above the keyboard.
 
 ## Project structure
 

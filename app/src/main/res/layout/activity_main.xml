@@ -3,11 +3,12 @@
     activity_main.xml
     ===================================================================
     The main screen. Top to bottom:
-      * A thin dark-blue Toolbar (the only "chrome"), giving access to
-        Settings and Reload via an overflow menu.
+      * A thin dark-blue Toolbar (Reload / Settings / keyboard / keys).
       * A horizontal ProgressBar that shows page-load progress.
-      * A SwipeRefreshLayout that wraps the WebView so the user can
-        pull down to reload (just like a chat app).
+      * A SwipeRefreshLayout (weighted, fills the screen) wrapping the
+        WebView, so the user can pull down to reload.
+      * A scrollable "terminal key bar" (Esc, Tab, Ctrl, arrows, …) that
+        sits just above the soft keyboard and makes a web shell usable.
     ===================================================================
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -37,7 +38,8 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <WebView
             android:id="@+id/webView"
@@ -45,5 +47,26 @@
             android:layout_height="match_parent" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!--
+        Terminal key bar. Populated in code from TerminalKeys.BAR.
+        Hidden until the user turns it on (toolbar "keys" action).
+    -->
+    <HorizontalScrollView
+        android:id="@+id/keyBarScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/odysseus_primary_dark"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/keyBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="4dp" />
+
+    </HorizontalScrollView>
 
 </LinearLayout>
